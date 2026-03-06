@@ -108,11 +108,14 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 上传二进制到服务器
+      - name: 上传二进制和 Nginx 配置到服务器
         run: |
           scp -i ~/.ssh/id_rsa \
             ${{ env.APP_NAME }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_DIR }}/
+          scp -i ~/.ssh/id_rsa \
+            deploy/nginx.conf \
+            ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:/tmp/fss-mining-nginx.conf
 
       - name: 远程部署 & 重启服务
         run: |
@@ -156,6 +159,14 @@ jobs:
 
             echo "✅ 部署成功，服务运行中"
             sudo systemctl status ${{ env.SERVICE_NAME }} --no-pager
+
+            # 更新并重载 Nginx 配置
+            if [ -f /tmp/fss-mining-nginx.conf ]; then
+              sudo cp /tmp/fss-mining-nginx.conf /etc/nginx/sites-available/fss-mining
+              sudo ln -sf /etc/nginx/sites-available/fss-mining /etc/nginx/sites-enabled/fss-mining
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "✅ Nginx 配置已更新"
+            fi
           EOF
 
       - name: 部署通知（失败时）

@@ -1,0 +1,25 @@
+[Unit]
+Description=FSS Mining System Server
+After=network.target mysql.service redis.service
+Wants=mysql.service redis.service
+
+[Service]
+Type=simple
+User=fss
+Group=fss
+WorkingDirectory=/opt/fss-mining
+ExecStart=/opt/fss-mining/fss-mining-server -config /opt/fss-mining/configs/config.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fss-mining
+
+# 安全限制
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/fss-mining/logs
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,37 @@
+server:
+  port: 8888
+  mode: debug  # debug | release
+
+database:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: "your_mysql_password"
+  dbname: fss_mining
+  charset: utf8mb4
+  max_idle_conns: 10
+  max_open_conns: 100
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  secret: "fss-mining-jwt-secret-change-in-production"
+  expire_hours: 72
+
+mining:
+  initial_circulation: 10000000      # 初始流通量 1000万
+  monthly_growth_rate: 0.10          # 月增长率 10%
+  static_ratio: 0.50                 # 静态奖励比例 50%
+  dynamic_ratio: 0.50                # 动态奖励比例 50%
+  min_stake: 100                     # 最低有效质押 100 FSS
+  max_stake: 2000                    # 最高有效算力 2000 FSS
+  transfer_delay_hours: 24           # 划转延迟小时数
+
+log:
+  level: info       # debug | info | warn | error
+  output: stdout    # stdout | file
+  file_path: "./logs/app.log"

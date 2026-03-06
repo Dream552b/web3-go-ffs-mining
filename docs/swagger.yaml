@@ -1,0 +1,627 @@
+basePath: /api/v1
+definitions:
+  internal_handler.AccountDetail:
+    properties:
+      available:
+        example: "1000.00000000"
+        type: string
+      balance:
+        example: "1000.00000000"
+        type: string
+      frozen:
+        example: "0.00000000"
+        type: string
+    type: object
+  internal_handler.ActivatePeriodReq:
+    properties:
+      month:
+        example: 2024-01
+        type: string
+    required:
+    - month
+    type: object
+  internal_handler.AssetsRespData:
+    properties:
+      mining:
+        $ref: '#/definitions/internal_handler.MiningAccountDetail'
+      mining_rules:
+        $ref: '#/definitions/internal_handler.MiningRules'
+      trade:
+        $ref: '#/definitions/internal_handler.AccountDetail'
+    type: object
+  internal_handler.BatchInfo:
+    properties:
+      actual_paid:
+        example: "16499.98765432"
+        type: string
+      dynamic_pool:
+        example: "16500.00000000"
+        type: string
+      static_pool:
+        example: "16500.00000000"
+        type: string
+      status:
+        example: completed
+        type: string
+      total_output:
+        example: "33000.00000000"
+        type: string
+      valid_users:
+        example: 1500
+        type: integer
+    type: object
+  internal_handler.InitPeriodReq:
+    properties:
+      growth_rate:
+        example: "0.1"
+        type: string
+      initial_circulation:
+        example: "10000000"
+        type: string
+      month:
+        example: 2024-01
+        type: string
+      month_number:
+        example: 1
+        minimum: 1
+        type: integer
+    required:
+    - growth_rate
+    - initial_circulation
+    - month
+    - month_number
+    type: object
+  internal_handler.LoginReq:
+    properties:
+      password:
+        example: password123
+        type: string
+      username:
+        example: alice
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  internal_handler.LoginRespData:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/internal_handler.UserInfo'
+    type: object
+  internal_handler.ManualSettleReq:
+    properties:
+      date:
+        example: "2024-01-01"
+        type: string
+    required:
+    - date
+    type: object
+  internal_handler.MiningAccountDetail:
+    properties:
+      available:
+        example: "500.00000000"
+        type: string
+      balance:
+        example: "500.00000000"
+        type: string
+      effective_power:
+        example: "500.00000000"
+        type: string
+      frozen:
+        example: "0.00000000"
+        type: string
+      is_valid_miner:
+        example: true
+        type: boolean
+    type: object
+  internal_handler.MiningRules:
+    properties:
+      max_stake:
+        example: 2000
+        type: number
+      min_stake:
+        example: 100
+        type: number
+    type: object
+  internal_handler.NetworkBoardRespData:
+    properties:
+      current_config:
+        $ref: '#/definitions/internal_handler.PeriodConfigInfo'
+      network_stats:
+        $ref: '#/definitions/internal_handler.NetworkStatsData'
+      yesterday_batch:
+        $ref: '#/definitions/internal_handler.BatchInfo'
+      yesterday_date:
+        example: "2024-01-01"
+        type: string
+    type: object
+  internal_handler.NetworkStatsData:
+    properties:
+      total_effective:
+        example: "3000000.00000000"
+        type: string
+      total_stake:
+        example: "5000000.00000000"
+        type: string
+      valid_users:
+        example: 1500
+        type: integer
+    type: object
+  internal_handler.PeriodConfigInfo:
+    properties:
+      daily_output:
+        example: "33333.33333333"
+        type: string
+      dynamic_ratio:
+        example: "0.5000"
+        type: string
+      max_stake:
+        example: "2000.00000000"
+        type: string
+      min_stake:
+        example: "100.00000000"
+        type: string
+      monthly_output:
+        example: "1000000.00000000"
+        type: string
+      period_month:
+        example: 2024-01
+        type: string
+      static_ratio:
+        example: "0.5000"
+        type: string
+    type: object
+  internal_handler.RegisterReq:
+    properties:
+      email:
+        example: alice@example.com
+        type: string
+      invite_code:
+        example: a1b2c3d4
+        type: string
+      password:
+        example: password123
+        maxLength: 64
+        minLength: 6
+        type: string
+      phone:
+        example: "13800138000"
+        type: string
+      username:
+        example: alice
+        maxLength: 32
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  internal_handler.RegisterRespData:
+    properties:
+      invite_code:
+        example: a1b2c3d4
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      username:
+        example: alice
+        type: string
+    type: object
+  internal_handler.ResponseErr:
+    properties:
+      code:
+        example: 10001
+        type: integer
+      message:
+        example: 请求参数错误
+        type: string
+    type: object
+  internal_handler.ResponseOK:
+    properties:
+      code:
+        example: 0
+        type: integer
+      data: {}
+      message:
+        example: 成功
+        type: string
+    type: object
+  internal_handler.RewardsRespData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/internal_handler.SettlementItem'
+        type: array
+      page:
+        example: 1
+        type: integer
+      size:
+        example: 20
+        type: integer
+      total:
+        example: 30
+        type: integer
+      total_reward:
+        example: "36.98765432"
+        type: string
+    type: object
+  internal_handler.SettlementItem:
+    properties:
+      dynamic_reward:
+        example: "0.00000000"
+        type: string
+      effective_power:
+        example: "500.00000000"
+        type: string
+      id:
+        example: 1
+        type: integer
+      network_power:
+        example: "100000.00000000"
+        type: string
+      settle_date:
+        example: "2024-01-01"
+        type: string
+      static_reward:
+        example: "1.23456789"
+        type: string
+      status:
+        example: paid
+        type: string
+      total_reward:
+        example: "1.23456789"
+        type: string
+    type: object
+  internal_handler.TransferInReq:
+    properties:
+      amount:
+        example: "200.00"
+        type: string
+      idempotent_key:
+        example: my-unique-key-001
+        type: string
+    required:
+    - amount
+    type: object
+  internal_handler.TransferOutReq:
+    properties:
+      amount:
+        example: "100.00"
+        type: string
+      idempotent_key:
+        example: my-unique-key-002
+        type: string
+    required:
+    - amount
+    type: object
+  internal_handler.TransferRespData:
+    properties:
+      amount:
+        example: "200.00000000"
+        type: string
+      effective_at:
+        example: "2024-01-02T00:00:00+08:00"
+        type: string
+      status:
+        example: locking
+        type: string
+      transfer_id:
+        example: 10
+        type: integer
+    type: object
+  internal_handler.UserInfo:
+    properties:
+      email:
+        example: alice@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      invite_code:
+        example: a1b2c3d4
+        type: string
+      phone:
+        example: "13800138000"
+        type: string
+      role:
+        example: user
+        type: string
+      username:
+        example: alice
+        type: string
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: dev@fss-mining.io
+    name: FSS 技术团队
+  description: FSS 代币挖矿系统后端接口文档。支持用户注册登录、资产查询、划转（交易区⇄挖矿区）、挖矿奖励查询、全网看板及管理员操作。
+  license:
+    name: MIT
+  termsOfService: http://swagger.io/terms/
+  title: FSS 挖矿系统 API
+  version: "1.0"
+paths:
+  /account/assets:
+    get:
+      description: 返回当前用户的交易区余额、挖矿区余额及有效算力。有效算力规则：min(max(质押量, 100), 2000)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: 查询用户资产
+      tags:
+      - 资产
+  /admin/mining/config/activate:
+    post:
+      consumes:
+      - application/json
+      description: 将指定月份的挖矿配置设置为当前激活配置（同时停用其他月份配置），激活后系统使用该配置进行每日结算
+      parameters:
+      - description: 激活信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.ActivatePeriodReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 月份不存在
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: '[管理] 激活某月挖矿配置'
+      tags:
+      - 管理员
+  /admin/mining/config/init:
+    post:
+      consumes:
+      - application/json
+      description: 根据月份、月编号（用于复利计算）、初始流通量和增长率生成该月的挖矿参数（每日产出、月产出等），生成后需调用 activate
+        接口激活
+      parameters:
+      - description: 配置信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.InitPeriodReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 参数错误 / 配置已存在
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: '[管理] 初始化某月挖矿配置'
+      tags:
+      - 管理员
+  /admin/mining/configs:
+    get:
+      description: 返回当前激活的挖矿周期配置详情
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 配置列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/internal_handler.ResponseOK'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_handler.PeriodConfigInfo'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: '[管理] 查询所有挖矿周期配置'
+      tags:
+      - 管理员
+  /admin/mining/settle:
+    post:
+      consumes:
+      - application/json
+      description: 对指定日期重新执行静态奖励结算，已完成的批次会被跳过（幂等保护），用于修复漏算或异常场景
+      parameters:
+      - description: 结算日期
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.ManualSettleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 日期格式错误 / 结算失败
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: '[管理] 手动触发补算'
+      tags:
+      - 管理员
+  /mining/network:
+    get:
+      description: 返回全网质押规模、有效算力、参与用户数、昨日产出及当前挖矿周期配置，无需登录可访问
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 全网看板数据
+          schema:
+            allOf:
+            - $ref: '#/definitions/internal_handler.ResponseOK'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_handler.NetworkBoardRespData'
+              type: object
+      summary: 全网挖矿看板（公开）
+      tags:
+      - 挖矿
+  /mining/period:
+    get:
+      description: 返回当前激活的月度挖矿配置，包含每日产出、月产出、静态/动态比例、质押门槛等
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 配置不存在
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      summary: 查询当前挖矿周期配置（公开）
+      tags:
+      - 挖矿
+  /mining/rewards:
+    get:
+      description: 分页查询当前用户的每日挖矿奖励明细，包含静态奖励、动态奖励、当日有效算力及全网算力
+      parameters:
+      - default: 1
+        description: 页码（默认1）
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量（默认20，最大100）
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: 查询个人挖矿奖励记录
+      tags:
+      - 挖矿
+  /transfer/in:
+    post:
+      consumes:
+      - application/json
+      description: 将交易区资产划转到挖矿区。划转后资金冻结，24小时后的次日00:00正式生效参与挖矿。支持幂等键防止重复提交。
+      parameters:
+      - description: 划转信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.TransferInReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 余额不足 / 低于最低门槛
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: 从交易区转入挖矿区
+      tags:
+      - 划转
+  /transfer/out:
+    post:
+      consumes:
+      - application/json
+      description: 将挖矿区资产划转回交易区。资金冻结，24小时后到账。支持幂等键防止重复提交。
+      parameters:
+      - description: 划转信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.TransferOutReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 余额不足
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: 从挖矿区转出到交易区
+      tags:
+      - 划转
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 使用用户名和密码登录，返回 JWT Token（有效期72小时）
+      parameters:
+      - description: 登录信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 用户名或密码错误
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      summary: 用户登录
+      tags:
+      - 用户
+  /user/profile:
+    get:
+      description: 返回当前登录用户的基本信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      security:
+      - BearerAuth: []
+      summary: 获取当前用户信息
+      tags:
+      - 用户
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: 注册新用户，系统自动创建交易区和挖矿区账户，并生成唯一邀请码
+      parameters:
+      - description: 注册信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 参数错误 / 用户名已存在
+          schema:
+            $ref: '#/definitions/internal_handler.ResponseErr'
+      summary: 用户注册
+      tags:
+      - 用户
+securityDefinitions:
+  BearerAuth:
+    description: 格式：Bearer {token}
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

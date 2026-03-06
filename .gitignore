@@ -1,0 +1,19 @@
+# 编译产物
+fss-mining-server
+fss-mining-server.exe
+*.exe
+
+# 配置文件（包含密码，不提交）
+configs/config.yaml
+!configs/config.example.yaml
+
+# 日志
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# 测试缓存
+coverage.out

@@ -1,0 +1,153 @@
+name: CI/CD - Build & Deploy
+
+on:
+  push:
+    branches:
+      - main       # 推送到 main 分支自动部署
+  workflow_dispatch:  # 支持手动触发
+
+env:
+  APP_NAME: fss-mining-server
+  DEPLOY_DIR: /opt/fss-mining
+  SERVICE_NAME: fss-mining
+
+jobs:
+  # ─────────────────────────────────────────
+  # Job 1: 代码检查 & 测试
+  # ─────────────────────────────────────────
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: 下载依赖
+        run: go mod download
+
+      - name: 代码格式检查
+        run: |
+          if [ "$(gofmt -l . | wc -l)" -gt 0 ]; then
+            echo "以下文件格式不规范:"
+            gofmt -l .
+            exit 1
+          fi
+
+      - name: go vet 静态检查
+        run: go vet ./...
+
+      - name: 运行单元测试
+        run: go test ./... -v -timeout 30s
+
+  # ─────────────────────────────────────────
+  # Job 2: 编译 & 生成 Swagger
+  # ─────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: 安装 swag CLI
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: 生成 Swagger 文档
+        run: swag init -g cmd/server/main.go -o docs --parseDependency --parseInternal
+
+      - name: 编译 Linux 二进制
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+          go build -ldflags="-s -w -X main.Version=${{ github.sha }}" \
+          -o ${{ env.APP_NAME }} ./cmd/server/
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary
+          path: |
+            ${{ env.APP_NAME }}
+            configs/config.yaml
+          retention-days: 1
+
+  # ─────────────────────────────────────────
+  # Job 3: 部署到服务器
+  # ─────────────────────────────────────────
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production   # 可在 GitHub 仓库设置中配置审批保护
+
+    steps:
+      - name: Checkout 代码（获取部署脚本）
+        uses: actions/checkout@v4
+
+      - name: 下载构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: binary
+
+      - name: 配置 SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 上传二进制到服务器
+        run: |
+          scp -i ~/.ssh/id_rsa \
+            ${{ env.APP_NAME }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_DIR }}/
+
+      - name: 远程部署 & 重启服务
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            set -e
+            cd ${{ env.DEPLOY_DIR }}
+
+            # 赋予执行权限
+            chmod +x ${{ env.APP_NAME }}
+
+            # 备份上一个版本
+            if [ -f "${{ env.APP_NAME }}.bak" ]; then
+              rm -f "${{ env.APP_NAME }}.bak"
+            fi
+            if [ -f "${{ env.APP_NAME }}.old" ]; then
+              mv "${{ env.APP_NAME }}.old" "${{ env.APP_NAME }}.bak"
+            fi
+            cp "${{ env.APP_NAME }}" "${{ env.APP_NAME }}.old" 2>/dev/null || true
+
+            # 重启 systemd 服务
+            sudo systemctl restart ${{ env.SERVICE_NAME }}
+            sleep 3
+
+            # 健康检查
+            if ! sudo systemctl is-active --quiet ${{ env.SERVICE_NAME }}; then
+              echo "❌ 服务启动失败，执行回滚..."
+              cp "${{ env.APP_NAME }}.bak" "${{ env.APP_NAME }}" || true
+              sudo systemctl restart ${{ env.SERVICE_NAME }}
+              exit 1
+            fi
+
+            echo "✅ 部署成功，服务运行中"
+            sudo systemctl status ${{ env.SERVICE_NAME }} --no-pager
+          EOF
+
+      - name: 部署通知（失败时）
+        if: failure()
+        run: echo "::error::部署失败，请检查日志"

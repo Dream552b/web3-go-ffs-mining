@@ -136,11 +136,20 @@ jobs:
             sudo systemctl restart ${{ env.SERVICE_NAME }}
             sleep 3
 
-            # 健康检查
+            # 健康检查（等待5秒让服务完全启动）
+            sleep 5
             if ! sudo systemctl is-active --quiet ${{ env.SERVICE_NAME }}; then
-              echo "❌ 服务启动失败，执行回滚..."
-              cp "${{ env.APP_NAME }}.bak" "${{ env.APP_NAME }}" || true
-              sudo systemctl restart ${{ env.SERVICE_NAME }}
+              echo "❌ 服务启动失败，打印日志："
+              echo "--- systemctl status ---"
+              sudo systemctl status ${{ env.SERVICE_NAME }} --no-pager || true
+              echo "--- journalctl 最近50行 ---"
+              sudo journalctl -u ${{ env.SERVICE_NAME }} -n 50 --no-pager || true
+              echo "--- 执行回滚 ---"
+              if [ -f "${{ env.APP_NAME }}.bak" ]; then
+                cp "${{ env.APP_NAME }}.bak" "${{ env.APP_NAME }}" || true
+                sudo systemctl restart ${{ env.SERVICE_NAME }} || true
+                echo "已回滚到上一版本"
+              fi
               exit 1
             fi
 
@@ -150,4 +159,4 @@ jobs:
 
       - name: 部署通知（失败时）
         if: failure()
-        run: echo "::error::部署失败，请检查日志"
+        run: echo "::error::部署失败，请检查 GitHub Actions 日志中的 journalctl 输出"

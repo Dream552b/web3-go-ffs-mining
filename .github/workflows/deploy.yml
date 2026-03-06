@@ -120,8 +120,9 @@ jobs:
             set -e
             cd ${{ env.DEPLOY_DIR }}
 
-            # 赋予执行权限
+            # 赋予执行权限并修正所有者
             chmod +x ${{ env.APP_NAME }}
+            sudo chown -R fss:fss ${{ env.DEPLOY_DIR }}/
 
             # 备份上一个版本
             if [ -f "${{ env.APP_NAME }}.bak" ]; then

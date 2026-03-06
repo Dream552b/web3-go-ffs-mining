@@ -6,7 +6,7 @@ database:
   host: 127.0.0.1
   port: 3306
   user: root
-  password: "your_mysql_password"
+  password: "1cddhBFEJV6UlD5IOv..@"
   dbname: fss_mining
   charset: utf8mb4
   max_idle_conns: 10

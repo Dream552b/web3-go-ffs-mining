@@ -47,7 +47,7 @@ func setupRouter(
 			user.POST("/login", userH.Login)
 		}
 
-		// 公开挖矿数据
+		// 公开挖 1矿数据
 		mining := api.Group("/mining")
 		{
 			mining.GET("/network", miningH.GetNetworkBoard)

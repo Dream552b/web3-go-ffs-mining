@@ -15,9 +15,9 @@ type Claims struct {
 }
 
 var (
-	ErrTokenExpired     = errors.New("token 已过期")
-	ErrTokenInvalid     = errors.New("token 无效")
-	ErrTokenMalformed   = errors.New("token 格式错误")
+	ErrTokenExpired   = errors.New("token 已过期")
+	ErrTokenInvalid   = errors.New("token 无效")
+	ErrTokenMalformed = errors.New("token 格式错误")
 )
 
 func Generate(userID uint, role string) (string, error) {

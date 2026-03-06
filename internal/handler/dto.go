@@ -136,9 +136,9 @@ type PeriodConfigInfo struct {
 
 // NetworkBoardRespData 全网看板响应数据
 type NetworkBoardRespData struct {
-	YesterdayDate string           `json:"yesterday_date" example:"2024-01-01"`
-	NetworkStats  NetworkStatsData `json:"network_stats"`
-	YesterdayBatch BatchInfo       `json:"yesterday_batch"`
+	YesterdayDate  string           `json:"yesterday_date" example:"2024-01-01"`
+	NetworkStats   NetworkStatsData `json:"network_stats"`
+	YesterdayBatch BatchInfo        `json:"yesterday_batch"`
 	CurrentConfig  PeriodConfigInfo `json:"current_config"`
 }
 

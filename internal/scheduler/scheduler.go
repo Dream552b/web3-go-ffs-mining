@@ -11,8 +11,8 @@ import (
 )
 
 type Scheduler struct {
-	c              *cron.Cron
-	settleService  *service.SettleService
+	c               *cron.Cron
+	settleService   *service.SettleService
 	transferService *service.TransferService
 }
 

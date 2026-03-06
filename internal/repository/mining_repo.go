@@ -145,9 +145,9 @@ func (r *MiningRepo) GetUserTotalReward(ctx context.Context, userID uint) (decim
 // GetNetworkStats 全网统计
 func (r *MiningRepo) GetNetworkStats(ctx context.Context, date time.Time) (map[string]any, error) {
 	type StakeStats struct {
-		TotalStake    decimal.Decimal
+		TotalStake     decimal.Decimal
 		TotalEffective decimal.Decimal
-		ValidUsers    int
+		ValidUsers     int
 	}
 	var stats StakeStats
 	err := r.db.WithContext(ctx).Model(&model.StakeSnapshot{}).

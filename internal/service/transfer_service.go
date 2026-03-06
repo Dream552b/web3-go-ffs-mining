@@ -13,10 +13,10 @@ import (
 )
 
 type TransferService struct {
-	db          *gorm.DB
-	accountRepo *repository.AccountRepo
+	db           *gorm.DB
+	accountRepo  *repository.AccountRepo
 	transferRepo *repository.TransferRepo
-	ledgerRepo  *repository.LedgerRepo
+	ledgerRepo   *repository.LedgerRepo
 }
 
 func NewTransferService(

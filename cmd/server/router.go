@@ -11,11 +11,11 @@ import (
 )
 
 func setupRouter(
-	userH    *handler.UserHandler,
+	userH *handler.UserHandler,
 	accountH *handler.AccountHandler,
 	transferH *handler.TransferHandlerV2,
-	miningH  *handler.MiningHandler,
-	adminH   *handler.AdminHandler,
+	miningH *handler.MiningHandler,
+	adminH *handler.AdminHandler,
 ) *gin.Engine {
 	r := gin.New()
 	r.Use(middleware.Recovery())

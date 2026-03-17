@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>USDT 一次性充值订单</title>
+    <style>
+        :root {
+            --bg: #03030c;
+            --panel: #161f32;
+            --text: #ffffff;
+            --muted: #9fa8b8;
+            --accent: #ff7a00;
+            --accent-2: #ffa548;
+            --line: #ff7a00;
+            /* PC 字号区间：12 / 14 / 16 */
+            --fs-12: 12px;
+            --fs-14: 14px;
+            --fs-16: 16px;
+            --fs-20: 20px;
+            --fs-26: 26px;
+            --fs-top-bar: var(--fs-16);
+            --fs-coin-name: var(--fs-14);
+            --fs-coin-desc: var(--fs-12);
+            --fs-label: var(--fs-16);
+            --fs-value: var(--fs-16);
+            --fs-amount: var(--fs-16);
+            --fs-btn: var(--fs-14);
+            --fs-tips: var(--fs-14);
+            --fs-expire: var(--fs-14);
+            --fs-notes: var(--fs-12);
+            --fs-order-id: var(--fs-12);
+
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: #222222;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .page {
+            width: 420px;
+            max-width: 420px;
+            height: 954px;
+            min-height: 924px;
+            background: var(--bg);
+            padding-bottom: 24px;
+        }
+
+        .top-bar {
+            background: linear-gradient(180deg, #1d2739 0%, #141d2f 100%);
+            text-align: center;
+            padding: 14px 12px;
+            font-size: var(--fs-top-bar);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 12px 18px 0;
+        }
+
+        .coin-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coin-icon {
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .coin-name {
+            font-size: var(--fs-coin-name);
+            line-height: 1.2;
+            margin: 0 0 2px;
+        }
+
+        .coin-desc {
+            margin: 0;
+            color: #f6f6f6;
+            opacity: 0.95;
+            font-size: var(--fs-coin-desc);
+            line-height: 1.2;
+        }
+
+        .label {
+            color: var(--accent);
+            text-align: center;
+            font-size: var(--fs-label);
+            margin: 28px 0 14px;
+            font-weight: 500;
+        }
+
+        .label.fixed-20 {
+            font-size: 20px;
+        }
+
+        .fs26 {
+            font-size: var(--fs-26) !important;
+        }
+
+        .qr-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .qr-card {
+            background: #ececec;
+            width: 170px;
+            height: 170px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        #qrcode canvas,
+        #qrcode img {
+            width: 154px !important;
+            height: 154px !important;
+            display: block;
+        }
+
+        .value {
+            text-align: center;
+            font-size: var(--fs-value);
+            line-height: 1.35;
+            word-break: break-all;
+            padding: 0 8px;
+        }
+
+        .amount {
+            font-size: var(--fs-amount);
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 0;
+        }
+
+        .copy-btn {
+            border: 1px solid var(--line);
+            color: var(--accent);
+            background: transparent;
+            border-radius: 8px;
+            font-size: var(--fs-btn);
+            line-height: 1;
+            padding: clamp(8px, 1.8vw, 10px) clamp(12px, 3vw, 16px);
+            cursor: pointer;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .tips-red {
+            color: #ff6b00;
+            text-align: center;
+            font-size: var(--fs-tips);
+            line-height: 1.25;
+            margin: 0px 0 10px;
+            word-break: break-word;
+        }
+
+        .expire {
+            color: #ff6b00;
+            font-size: var(--fs-expire);
+            margin: 12px 0 0;
+            text-align: left;
+        }
+
+        [dir="rtl"] .expire {
+            text-align: right;
+        }
+
+        .notes {
+            margin-top: 12px;
+            color: #c6ccd8;
+            font-size: var(--fs-notes);
+            line-height: 1.55;
+        }
+
+        .order-id {
+            margin-top: 28px;
+            color: #8e95a7;
+            text-align: center;
+            font-size: var(--fs-order-id);
+            letter-spacing: 0.3px;
+        }
+
+        #walletAddress,
+        #amountValue,
+        #orderNoText,
+        #expireTime {
+            direction: ltr;
+            unicode-bidi: embed;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 26px;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.78);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 999;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 360px) {
+            .content {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            :root {
+                /* H5 端在 12-16 区间内随屏幕缩放 */
+                --fs-top-bar: clamp(14px, 4vw, 16px);
+                --fs-coin-name: clamp(13px, 3.6vw, 14px);
+                --fs-coin-desc: clamp(12px, 3.2vw, 14px);
+                --fs-label: clamp(14px, 4.4vw, 16px);
+                --fs-value: clamp(14px, 4.2vw, 16px);
+                --fs-amount: clamp(14px, 4.8vw, 16px);
+                --fs-btn: clamp(12px, 3.8vw, 14px);
+                --fs-tips: clamp(12px, 3.8vw, 14px);
+                --fs-expire: clamp(12px, 3.8vw, 14px);
+                --fs-notes: clamp(12px, 3.4vw, 14px);
+                --fs-order-id: 12px;
+            }
+
+            .page {
+                width: 100%;
+                max-width: 420px;
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="top-bar" id="topTitle">USDT - One-time Deposit Order</header>
+
+        <section class="content">
+            <div class="coin-card">
+                <img class="coin-icon" src="./usdt.png" alt="">
+                <div>
+                    <p class="coin-name" id="coinName">USDT - TRC20 - Global Public Blockchain</p>
+                    <p class="coin-desc" id="coinDesc">Low fee / Fast confirmation / Secure and stable</p>
+                </div>
+            </div>
+
+            <h2 class="label fixed-20" id="labelQr">Wallet Address QR Code</h2>
+            <div class="qr-wrap">
+                <div class="qr-card">
+                    <div id="qrcode" aria-label="钱包地址二维码"></div>
+                </div>
+            </div>
+
+            <h2 class="label fixed-20" style="margin-bottom: 10px;" id="labelAddress">Wallet Address</h2>
+            <div class="value" id="walletAddress"></div>
+            <div class="btn-wrap">
+                <button class="copy-btn" type="button" id="copyAddressBtn">Copy Wallet Address</button>
+            </div>
+
+            <h2 class="label" id="labelAmount">Payment Amount</h2>
+
+            <div class="value fs26">$ <span id="amountValue"></span></div>
+            <div class="btn-wrap">
+                <button class="copy-btn" type="button" id="copyAmountBtn">Copy Amount</button>
+            </div>
+            <p class="tips-red" style="margin-top: 10px;" id="exactAmountTip">Please transfer the exact amount shown in the order, otherwise it may not be credited automatically.</p>
+
+            <p class="tips-red" style="margin-top: 20px;" id="tipsText">Do not pay after timeout / Do not pay twice / Do not reuse / Do not change amount</p>
+
+            <p class="expire"><span id="expireLabel">Expiry Time: </span><span id="expireTime"></span></p>
+
+            <div class="notes" id="notesText">
+                *Notes:<br />
+                1. Please verify the currency, address format, and chain type at the top. Do not transfer via the wrong channel or with wrong amount.<br />
+                2. If close to expiry, do not pay. Please create a new order.<br />
+                3. This QR code, address, and amount are for one-time transfer only. Do not reuse.
+            </div>
+
+            <div class="order-id" id="orderNoText">Order No / ID: --</div>
+        </section>
+    </main>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        // const API_BASE = "http://127.0.0.1:9000";
+        const API_BASE = "https://web-test.trtopsport.com";
+        const DEFAULT_ORDER_ID = "";
+        let walletAddress = "";
+        let amount = "";
+        const params = new URLSearchParams(window.location.search);
+        const currentLang = params.get("lang") === "ar" ? "ar" : "en";
+
+        const i18n = {
+            en: {
+                title: "USDT - One-time Deposit Order",
+                coinName: "USDT - TRC20 - Global Public Blockchain",
+                coinDesc: "Low fee / Fast confirmation / Secure and stable",
+                labelQr: "Wallet Address QR Code",
+                labelAddress: "Wallet Address",
+                labelAmount: "Payment Amount",
+                copyAddressBtn: "Copy Wallet Address",
+                copyAmountBtn: "Copy Amount",
+                exactAmountTip: "Please transfer the exact amount shown in the order, otherwise it may not be credited automatically.",
+                tips: "Do not pay after timeout / Do not pay twice / Do not reuse / Do not change amount",
+                expireLabel: "Expiry Time: ",
+                notesHtml: "*Notes:<br />1. Please verify the currency, address format, and chain type at the top. Do not transfer via the wrong channel or with wrong amount.<br />2. If close to expiry, do not pay. Please create a new order.<br />3. This QR code, address, and amount are for one-time transfer only. Do not reuse.",
+                orderNoPrefix: "Order No / ID: ",
+                toastCopyAddress: "Wallet address copied",
+                toastCopyAmount: "Amount copied",
+                toastCopyFailed: "Copy failed, please copy manually",
+                toastOrderNotFound: "Order not found or expired",
+                toastLoadFailed: "Failed to load order, please check local API"
+            },
+            ar: {
+                title: "USDT - طلب إيداع لمرة واحدة",
+                coinName: "USDT - TRC20 - شبكة بلوكتشين عامة عالمية",
+                coinDesc: "رسوم منخفضة / تأكيد سريع / آمن ومستقر",
+                labelQr: "رمز QR لعنوان المحفظة",
+                labelAddress: "عنوان المحفظة",
+                labelAmount: "مبلغ الدفع",
+                copyAddressBtn: "نسخ عنوان المحفظة",
+                copyAmountBtn: "نسخ مبلغ التحويل",
+                exactAmountTip: "يرجى التحويل بالمبلغ الدقيق المعروض في الطلب، وإلا قد لا تتم إضافته تلقائيًا.",
+                tips: "يرجى عدم الدفع بعد انتهاء الوقت / عدم الدفع مرتين / عدم إعادة الاستخدام / عدم تعديل المبلغ",
+                expireLabel: "وقت انتهاء الطلب: ",
+                notesHtml: "*ملاحظات:<br />1. يرجى التحقق من نوع العملة وصيغة العنوان ونوع الشبكة في أعلى الصفحة، ولا تقم بالتحويل عبر قناة خاطئة أو بمبلغ خاطئ.<br />2. إذا كان الوقت قريبًا من الانتهاء فلا تدفع، يرجى إنشاء طلب جديد.<br />3. هذا الرمز والعنوان والمبلغ صالحون لتحويل واحد فقط، لا تعِد الاستخدام.",
+                orderNoPrefix: "رقم الطلب / ID: ",
+                toastCopyAddress: "تم نسخ عنوان المحفظة",
+                toastCopyAmount: "تم نسخ المبلغ",
+                toastCopyFailed: "فشل النسخ، يرجى النسخ يدويًا",
+                toastOrderNotFound: "الطلب غير موجود أو منتهي الصلاحية",
+                toastLoadFailed: "فشل تحميل الطلب، يرجى التحقق من الواجهة المحلية"
+            }
+        };
+        const t = i18n[currentLang];
+        const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+        const localeConfig = currentLang === "ar"
+            ? { locale: "ar-EG", timeZone: "Africa/Cairo" }
+            : { locale: "en-US", timeZone: systemTimeZone };
+
+        const qrcodeEl = document.getElementById("qrcode");
+        const walletAddressEl = document.getElementById("walletAddress");
+        const amountValueEl = document.getElementById("amountValue");
+        const orderNoTextEl = document.getElementById("orderNoText");
+
+        function applyI18n() {
+            document.documentElement.lang = currentLang === "ar" ? "ar" : "en";
+            document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+            document.title = t.title;
+            document.getElementById("topTitle").textContent = t.title;
+            document.getElementById("coinName").textContent = t.coinName;
+            document.getElementById("coinDesc").textContent = t.coinDesc;
+            document.getElementById("labelQr").textContent = t.labelQr;
+            document.getElementById("labelAddress").textContent = t.labelAddress;
+            document.getElementById("labelAmount").textContent = t.labelAmount;
+            document.getElementById("copyAddressBtn").textContent = t.copyAddressBtn;
+            document.getElementById("copyAmountBtn").textContent = t.copyAmountBtn;
+            document.getElementById("exactAmountTip").textContent = t.exactAmountTip;
+            document.getElementById("tipsText").textContent = t.tips;
+            document.getElementById("expireLabel").textContent = t.expireLabel;
+            document.getElementById("notesText").innerHTML = t.notesHtml;
+        }
+
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            const hh = String(date.getHours()).padStart(2, "0");
+            const mm = String(date.getMinutes()).padStart(2, "0");
+            const ss = String(date.getSeconds()).padStart(2, "0");
+            return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+        }
+
+        function formatExpireAt(expireAtSec) {
+            const n = Number(expireAtSec);
+            if (!Number.isFinite(n) || n <= 0) return "--";
+            const date = new Date(n * 1000);
+            try {
+                if (currentLang !== "ar") {
+                    const parts = new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                        timeZone: localeConfig.timeZone,
+                        timeZoneName: "short"
+                    }).formatToParts(date);
+                    const map = {};
+                    parts.forEach(p => {
+                        map[p.type] = p.value;
+                    });
+                    const tzText = map.timeZoneName ? ` ${map.timeZoneName}` : "";
+                    return `${map.year}/${map.month}/${map.day}, ${map.hour}:${map.minute}:${map.second}${tzText}`;
+                }
+                return new Intl.DateTimeFormat(localeConfig.locale, {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                    timeZone: localeConfig.timeZone,
+                    timeZoneName: "short"
+                }).format(date);
+            } catch (e) {
+                return formatDate(date);
+            }
+        }
+
+        function renderQRCode(text) {
+            qrcodeEl.innerHTML = "";
+            new QRCode(qrcodeEl, {
+                text: text,
+                width: 154,
+                height: 154,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        function formatAmount(v) {
+            const n = Number(v);
+            if (Number.isNaN(n)) return String(v || "");
+            return String(n);
+        }
+
+        function renderOrder(order) {
+            walletAddress = order.toAddress || "";
+            amount = formatAmount(order.applyAmount);
+
+            walletAddressEl.textContent = walletAddress || "--";
+            amountValueEl.textContent = amount || "--";
+            orderNoTextEl.textContent = `${t.orderNoPrefix}${order.orderNo || "--"}`;
+            document.getElementById("expireTime").textContent = formatExpireAt(order.expireAt);
+
+            if (walletAddress) {
+                renderQRCode(walletAddress);
+            } else {
+                qrcodeEl.innerHTML = "";
+            }
+        }
+
+        const toast = document.getElementById("toast");
+        function showToast(text) {
+            toast.textContent = text;
+            toast.classList.add("show");
+            window.clearTimeout(showToast.timer);
+            showToast.timer = window.setTimeout(() => {
+                toast.classList.remove("show");
+            }, 1400);
+        }
+
+        async function copyText(text, successText) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const input = document.createElement("textarea");
+                    input.value = text;
+                    input.style.position = "fixed";
+                    input.style.left = "-9999px";
+                    document.body.appendChild(input);
+                    input.focus();
+                    input.select();
+                    document.execCommand("copy");
+                    input.remove();
+                }
+                showToast(successText);
+            } catch (error) {
+                showToast(t.toastCopyFailed);
+            }
+        }
+
+        async function loadOrder() {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get("order") || params.get("id") || DEFAULT_ORDER_ID;
+            if (!orderId) return
+            try {
+                const resp = await fetch(`${API_BASE}/api/v2/wallet/deposit/order?id=${encodeURIComponent(orderId)}`);
+                const json = await resp.json();
+                if (!resp.ok || json.code !== 0) {
+                    throw new Error(json.msg || "接口请求失败");
+                }
+                if (!json.data) {
+                    walletAddressEl.textContent = "--";
+                    amountValueEl.textContent = "--";
+                    orderNoTextEl.textContent = `${t.orderNoPrefix}${orderId}`;
+                    document.getElementById("expireTime").textContent = "--";
+                    qrcodeEl.innerHTML = "";
+                    showToast(t.toastOrderNotFound);
+                    return;
+                }
+                renderOrder(json.data);
+            } catch (error) {
+                console.error(error);
+                showToast(t.toastLoadFailed);
+            }
+        }
+
+        document.getElementById("copyAddressBtn").addEventListener("click", () => {
+            copyText(walletAddress, t.toastCopyAddress);
+        });
+
+        document.getElementById("copyAmountBtn").addEventListener("click", () => {
+            copyText(amount, t.toastCopyAmount);
+        });
+
+        applyI18n();
+        loadOrder();
+    </script>
+</body>
+
+</html>
